@@ -275,6 +275,14 @@ function sheikh_bassam_kayed_create_essential_pages() {
             'title'   => __( 'اتصل بنا', 'sheikh-bassam-kayed' ),
             'content' => '', // Empty content - use Customizer text instead
         ),
+        'dashboard-login' => array(
+            'title'   => __( 'تسجيل الدخول - لوحة التحكم', 'sheikh-bassam-kayed' ),
+            'content' => '',
+        ),
+        'dashboard' => array(
+            'title'   => __( 'لوحة التحكم', 'sheikh-bassam-kayed' ),
+            'content' => '',
+        ),
     );
     
     foreach ( $pages as $slug => $page_data ) {
@@ -363,6 +371,12 @@ require_once get_template_directory() . '/inc/whatsapp-config.php';
 
 // Include Social Media configuration
 require_once get_template_directory() . '/inc/social-media.php';
+
+// Include Dashboard Authentication
+require_once get_template_directory() . '/inc/dashboard-auth.php';
+
+// Include Dashboard Management
+require_once get_template_directory() . '/inc/dashboard-manager.php';
 
 // Add Hero Section Customizer Option
 function sheikh_bassam_kayed_customize_register( $wp_customize ) {
