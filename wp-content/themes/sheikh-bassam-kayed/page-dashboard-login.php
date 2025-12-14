@@ -9,7 +9,7 @@ get_header();
 
 // If already authenticated, redirect to dashboard
 if ( isset( $_SESSION['dashboard_authenticated'] ) && $_SESSION['dashboard_authenticated'] === true ) {
-    wp_safe_redirect( home_url( '/dashboard' ) );
+    wp_safe_redirect( home_url( '/dashboard/hero' ) );
     exit;
 }
 

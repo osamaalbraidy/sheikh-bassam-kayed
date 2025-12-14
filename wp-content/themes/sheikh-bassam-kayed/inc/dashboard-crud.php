@@ -39,7 +39,16 @@ function sheikh_bassam_kayed_handle_dashboard_crud() {
             $_SESSION['dashboard_error'] = __( 'حدث خطأ أثناء إنشاء العنصر', 'sheikh-bassam-kayed' );
         }
         
-        wp_safe_redirect( home_url( '/dashboard/' . $post_type ) );
+        // Map post types to dashboard tabs
+        $post_type_to_tab = array(
+            'book' => 'books',
+            'audio_lecture' => 'audio',
+            'friday_khutbah' => 'khutbahs',
+            'video' => 'videos',
+            'gallery' => 'gallery'
+        );
+        $tab = isset( $post_type_to_tab[ $post_type ] ) ? $post_type_to_tab[ $post_type ] : $post_type;
+        wp_safe_redirect( home_url( '/dashboard/' . $tab ) );
         exit;
     }
     
@@ -68,7 +77,16 @@ function sheikh_bassam_kayed_handle_dashboard_crud() {
         }
         
         $_SESSION['dashboard_success'] = __( 'تم تحديث العنصر بنجاح', 'sheikh-bassam-kayed' );
-        wp_safe_redirect( home_url( '/dashboard?tab=' . $post->post_type ) );
+        // Map post types to dashboard tabs
+        $post_type_to_tab = array(
+            'book' => 'books',
+            'audio_lecture' => 'audio',
+            'friday_khutbah' => 'khutbahs',
+            'video' => 'videos',
+            'gallery' => 'gallery'
+        );
+        $tab = isset( $post_type_to_tab[ $post->post_type ] ) ? $post_type_to_tab[ $post->post_type ] : $post->post_type;
+        wp_safe_redirect( home_url( '/dashboard/' . $tab ) );
         exit;
     }
     
@@ -83,7 +101,16 @@ function sheikh_bassam_kayed_handle_dashboard_crud() {
             $_SESSION['dashboard_error'] = __( 'حدث خطأ أثناء حذف العنصر', 'sheikh-bassam-kayed' );
         }
         
-        wp_safe_redirect( home_url( '/dashboard?tab=' . $post->post_type ) );
+        // Map post types to dashboard tabs
+        $post_type_to_tab = array(
+            'book' => 'books',
+            'audio_lecture' => 'audio',
+            'friday_khutbah' => 'khutbahs',
+            'video' => 'videos',
+            'gallery' => 'gallery'
+        );
+        $tab = isset( $post_type_to_tab[ $post->post_type ] ) ? $post_type_to_tab[ $post->post_type ] : $post->post_type;
+        wp_safe_redirect( home_url( '/dashboard/' . $tab ) );
         exit;
     }
 }

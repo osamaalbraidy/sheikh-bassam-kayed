@@ -44,15 +44,16 @@ if ( ! empty( $dashboard_tab ) ) {
 } else {
     // Fallback: parse from REQUEST_URI
     $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
-    if ( preg_match( '/\/dashboard\/([^\/\?]+)/', $request_uri, $matches ) ) {
+    // Remove query string for parsing
+    $request_path = parse_url( $request_uri, PHP_URL_PATH );
+    
+    if ( preg_match( '/\/dashboard\/([^\/\?]+)/', $request_path, $matches ) ) {
         $active_tab = sanitize_text_field( $matches[1] );
     } elseif ( isset( $_GET['tab'] ) ) {
         $active_tab = sanitize_text_field( $_GET['tab'] );
-    } elseif ( strpos( $request_uri, '/dashboard' ) !== false && strpos( $request_uri, '/dashboard/' ) === false ) {
-        // If just /dashboard without a tab, redirect to /dashboard/hero
-        wp_safe_redirect( home_url( '/dashboard/hero' ) );
-        exit;
     }
+    // If we're on /dashboard without a tab, just default to 'hero' tab (no redirect needed)
+    // The page will display with hero tab active by default
 }
 
 // Valid tabs
@@ -1048,12 +1049,12 @@ $editing_post = $editing_post_id ? get_post( $editing_post_id ) : null;
                     if (formWrapper) {
                         formWrapper.classList.remove('show');
                         // Redirect to clean URL (remove edit parameter)
-                        var baseUrl = window.location.pathname;
-                        if (tab) {
-                            window.location.href = baseUrl.split('/').slice(0, -1).join('/') + '/' + tab;
-                        } else {
-                            window.location.href = baseUrl.split('?')[0];
-                        }
+                        // Simply remove query parameters from current URL
+                        var currentUrl = window.location.href;
+                        var urlWithoutQuery = currentUrl.split('?')[0];
+                        // Remove trailing slash if present
+                        urlWithoutQuery = urlWithoutQuery.replace(/\/$/, '');
+                        window.location.href = urlWithoutQuery;
                     }
                 });
             });

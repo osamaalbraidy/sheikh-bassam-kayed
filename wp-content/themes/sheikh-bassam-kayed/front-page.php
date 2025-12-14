@@ -69,9 +69,8 @@ get_header();
                 <?php
                 $books_query = new WP_Query( array(
                     'post_type' => 'book',
-                    'posts_per_page' => 3,
-                    'orderby' => 'date',
-                    'order' => 'DESC',
+                    'posts_per_page' => 10,
+                    'orderby' => 'rand',
                 ) );
                 
                 if ( $books_query->have_posts() ) {
@@ -138,9 +137,8 @@ get_header();
                 <?php
                 $audio_query = new WP_Query( array(
                     'post_type' => 'audio_lecture',
-                    'posts_per_page' => 3,
-                    'orderby' => 'date',
-                    'order' => 'DESC',
+                    'posts_per_page' => 10,
+                    'orderby' => 'rand',
                 ) );
                 
                 if ( $audio_query->have_posts() ) {
@@ -203,9 +201,8 @@ get_header();
                 <?php
                 $videos_query = new WP_Query( array(
                     'post_type' => 'video',
-                    'posts_per_page' => 3,
-                    'orderby' => 'date',
-                    'order' => 'DESC',
+                    'posts_per_page' => 10,
+                    'orderby' => 'rand',
                 ) );
                 
                 if ( $videos_query->have_posts() ) {
@@ -261,13 +258,12 @@ get_header();
                 <h2 class="section-title">أحدث خطب الجمعة</h2>
                 <div class="section-line"></div>
             </div>
-            <div class="khutbah-cards-list">
+            <div class="khutbah-cards-grid">
                 <?php
                 $khutbahs_query = new WP_Query( array(
                     'post_type' => 'friday_khutbah',
-                    'posts_per_page' => 3,
-                    'orderby' => 'date',
-                    'order' => 'DESC',
+                    'posts_per_page' => 10,
+                    'orderby' => 'rand',
                 ) );
                 
                 if ( $khutbahs_query->have_posts() ) {
@@ -318,9 +314,8 @@ get_header();
                 <?php
                 $gallery_query = new WP_Query( array(
                     'post_type' => 'gallery',
-                    'posts_per_page' => 6,
-                    'orderby' => 'date',
-                    'order' => 'DESC',
+                    'posts_per_page' => 10,
+                    'orderby' => 'rand',
                 ) );
                 
                 if ( $gallery_query->have_posts() ) {

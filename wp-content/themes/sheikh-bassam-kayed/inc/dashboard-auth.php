@@ -39,7 +39,7 @@ function sheikh_bassam_kayed_dashboard_login() {
             if ( in_array( 'dashboard_user', $user_roles ) || in_array( 'administrator', $user_roles ) ) {
                 $_SESSION['dashboard_authenticated'] = true;
                 $_SESSION['dashboard_user_id'] = $user->ID;
-                wp_safe_redirect( home_url( '/dashboard' ) );
+                wp_safe_redirect( home_url( '/dashboard/hero' ) );
                 exit;
             } else {
                 $_SESSION['dashboard_error'] = __( 'ليس لديك صلاحية للوصول إلى لوحة التحكم', 'sheikh-bassam-kayed' );
@@ -72,32 +72,46 @@ add_action( 'template_redirect', 'sheikh_bassam_kayed_dashboard_logout' );
 
 // Protect dashboard pages
 function sheikh_bassam_kayed_protect_dashboard() {
-    // Check if it's a dashboard page
-    $dashboard_pages = array( 'dashboard', 'dashboard-hero', 'dashboard-about', 'dashboard-contact', 'dashboard-social', 'dashboard-whatsapp', 'dashboard-books', 'dashboard-audio', 'dashboard-khutbahs', 'dashboard-videos', 'dashboard-gallery' );
+    // Skip if already redirected (prevent loops)
+    if ( headers_sent() ) {
+        return;
+    }
     
+    // Skip protection for login page
+    $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+    if ( strpos( $request_uri, '/dashboard-login' ) !== false ) {
+        return;
+    }
+    
+    // Check if it's a dashboard page by checking the queried object
     $current_page = get_queried_object();
+    $is_dashboard_page = false;
+    
     if ( $current_page && isset( $current_page->post_name ) ) {
         $page_slug = $current_page->post_name;
-        
-        // Check if it's a dashboard page
-        if ( in_array( $page_slug, $dashboard_pages ) || strpos( $page_slug, 'dashboard' ) === 0 ) {
-            if ( ! sheikh_bassam_kayed_is_dashboard_authenticated() ) {
-                wp_safe_redirect( home_url( '/dashboard-login' ) );
-                exit;
-            }
+        if ( $page_slug === 'dashboard' ) {
+            $is_dashboard_page = true;
         }
     }
     
-    // Also check URL pattern for /dashboard/* routes
-    $request_uri = $_SERVER['REQUEST_URI'];
-    if ( strpos( $request_uri, '/dashboard/' ) !== false && strpos( $request_uri, '/dashboard-login' ) === false ) {
-        if ( ! sheikh_bassam_kayed_is_dashboard_authenticated() ) {
+    // Also check URL pattern for /dashboard/* routes (from rewrite rules)
+    $dashboard_tab = get_query_var( 'dashboard_tab' );
+    if ( ! empty( $dashboard_tab ) ) {
+        $is_dashboard_page = true;
+    } elseif ( preg_match( '/\/dashboard(\/|$)/', $request_uri ) ) {
+        $is_dashboard_page = true;
+    }
+    
+    // If it's a dashboard page and user is not authenticated, redirect to login
+    if ( $is_dashboard_page && ! sheikh_bassam_kayed_is_dashboard_authenticated() ) {
+        // Only redirect if we're not already on the login page (prevent loop)
+        if ( strpos( $request_uri, '/dashboard-login' ) === false ) {
             wp_safe_redirect( home_url( '/dashboard-login' ) );
             exit;
         }
     }
 }
-add_action( 'template_redirect', 'sheikh_bassam_kayed_protect_dashboard' );
+add_action( 'template_redirect', 'sheikh_bassam_kayed_protect_dashboard', 5 );
 
 // Admin page to create dashboard users
 function sheikh_bassam_kayed_add_dashboard_user_admin_page() {
