@@ -14,7 +14,9 @@ if ( ! sheikh_bassam_kayed_is_dashboard_authenticated() ) {
 get_header();
 
 $success_message = isset( $_SESSION['dashboard_success'] ) ? $_SESSION['dashboard_success'] : '';
+$error_message = isset( $_SESSION['dashboard_error'] ) ? $_SESSION['dashboard_error'] : '';
 unset( $_SESSION['dashboard_success'] );
+unset( $_SESSION['dashboard_error'] );
 
 // Get current settings
 $hero_intro = get_theme_mod( 'hero_intro_text', '' );
@@ -31,6 +33,37 @@ $social_youtube = get_theme_mod( 'social_youtube', '' );
 $social_instagram = get_theme_mod( 'social_instagram', '' );
 $social_telegram = get_theme_mod( 'social_telegram', '' );
 $social_linkedin = get_theme_mod( 'social_linkedin', '' );
+
+// Get active tab from URL - use query var first, then REQUEST_URI, default to 'hero'
+$active_tab = 'hero'; // Default to first tab
+
+// Try to get from query var (set by rewrite rule)
+$dashboard_tab = get_query_var( 'dashboard_tab' );
+if ( ! empty( $dashboard_tab ) ) {
+    $active_tab = sanitize_text_field( $dashboard_tab );
+} else {
+    // Fallback: parse from REQUEST_URI
+    $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+    if ( preg_match( '/\/dashboard\/([^\/\?]+)/', $request_uri, $matches ) ) {
+        $active_tab = sanitize_text_field( $matches[1] );
+    } elseif ( isset( $_GET['tab'] ) ) {
+        $active_tab = sanitize_text_field( $_GET['tab'] );
+    } elseif ( strpos( $request_uri, '/dashboard' ) !== false && strpos( $request_uri, '/dashboard/' ) === false ) {
+        // If just /dashboard without a tab, redirect to /dashboard/hero
+        wp_safe_redirect( home_url( '/dashboard/hero' ) );
+        exit;
+    }
+}
+
+// Valid tabs
+$valid_tabs = array( 'hero', 'about', 'contact', 'social', 'whatsapp', 'books', 'audio', 'khutbahs', 'videos', 'gallery' );
+if ( ! in_array( $active_tab, $valid_tabs ) ) {
+    $active_tab = 'hero';
+}
+
+// Get editing post ID if in edit mode
+$editing_post_id = isset( $_GET['edit'] ) ? intval( $_GET['edit'] ) : 0;
+$editing_post = $editing_post_id ? get_post( $editing_post_id ) : null;
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> dir="rtl">
@@ -109,9 +142,10 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
         }
         .dashboard-content {
             background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            min-height: 600px;
         }
         .tab-content {
             display: none;
@@ -124,9 +158,21 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
         }
         .form-section h3 {
             color: #1B7560;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #1B7560;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .form-section h4 {
+            color: #333;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 15px;
+            background: linear-gradient(90deg, rgba(27, 117, 96, 0.1) 0%, transparent 100%);
+            border-right: 4px solid #1B7560;
+            border-radius: 6px;
         }
         .form-group {
             margin-bottom: 20px;
@@ -140,13 +186,23 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
         .form-group input[type="text"],
         .form-group input[type="url"],
         .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
         .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
             font-family: inherit;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            background: #fff;
+            border-color: #1B7560;
+            box-shadow: 0 0 0 3px rgba(27, 117, 96, 0.1);
         }
         .form-group textarea {
             min-height: 120px;
@@ -158,26 +214,60 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
             border-color: #1B7560;
         }
         .submit-button {
-            background: #1B7560;
+            background: linear-gradient(135deg, #1B7560 0%, #135243 100%);
             color: #fff;
-            padding: 12px 30px;
+            padding: 14px 35px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(27, 117, 96, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .submit-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
         .submit-button:hover {
-            background: #135243;
+            background: linear-gradient(135deg, #135243 0%, #1B7560 100%);
+            box-shadow: 0 6px 20px rgba(27, 117, 96, 0.4);
+            transform: translateY(-2px);
+        }
+        .submit-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        .submit-button:active {
+            transform: translateY(0);
         }
         .success-message {
-            background: #d4edda;
+            background: linear-gradient(90deg, #d4edda 0%, #c3e6cb 100%);
             color: #155724;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #c3e6cb;
+            padding: 18px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-right: 4px solid #28a745;
+            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.2);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        .success-message::before {
+            content: '✓';
+            margin-left: 10px;
+            font-size: 20px;
+            font-weight: bold;
         }
         .image-upload-wrapper {
             display: flex;
@@ -232,27 +322,340 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
         .image-preview.hidden {
             display: none;
         }
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
+        .file-upload-button {
+            padding: 12px 20px;
+            background: #1B7560;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background 0.3s;
+            margin-right: 10px;
         }
-        .quick-link-card {
+        .file-upload-button:hover {
+            background: #135243;
+        }
+        .dashboard-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 25px;
             background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .dashboard-table thead tr {
+            background: linear-gradient(135deg, #1B7560 0%, #135243 100%);
+        }
+        .dashboard-table th {
+            padding: 18px 15px;
+            text-align: right;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .dashboard-table th:first-child {
+            border-top-right-radius: 10px;
+        }
+        .dashboard-table th:last-child {
+            border-top-left-radius: 10px;
+        }
+        .dashboard-table td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: right;
+            color: #333;
+        }
+        .dashboard-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        .dashboard-table tbody tr:hover {
+            background: rgba(27, 117, 96, 0.05);
+            transform: scale(1.01);
+        }
+        .dashboard-table tbody tr:last-child td:first-child {
+            border-bottom-right-radius: 10px;
+        }
+        .dashboard-table tbody tr:last-child td:last-child {
+            border-bottom-left-radius: 10px;
+        }
+        .dashboard-table td:last-child {
             text-align: center;
         }
-        .quick-link-card a {
+        .dashboard-table a {
             color: #1B7560;
             text-decoration: none;
+            margin: 0 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
             font-weight: 600;
-            display: block;
+            transition: all 0.3s ease;
+            display: inline-block;
+            background: rgba(27, 117, 96, 0.1);
         }
-        .quick-link-card a:hover {
-            text-decoration: underline;
+        .dashboard-table a:hover {
+            background: #1B7560;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(27, 117, 96, 0.3);
+        }
+        .dashboard-table a.delete-link {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+        .dashboard-table a.delete-link:hover {
+            background: #dc3545;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+        }
+        .dashboard-table img {
+            max-width: 80px;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* CRUD Form Styles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #1B7560;
+        }
+        .section-header h3 {
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+        .add-new-button {
+            background: linear-gradient(135deg, #1B7560 0%, #135243 100%);
+            color: #fff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(27, 117, 96, 0.3);
+        }
+        .add-new-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(27, 117, 96, 0.4);
+        }
+        .crud-form-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+            margin-bottom: 0;
+            padding: 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 2px solid transparent;
+        }
+        .crud-form-wrapper.show {
+            max-height: 5000px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-color: #1B7560;
+        }
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .form-header h4 {
+            margin: 0;
+            padding: 0;
+            border: none;
+            background: none;
+        }
+        .close-form-button {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .close-form-button:hover {
+            background: #c82333;
+            transform: rotate(90deg);
+        }
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .cancel-form-button {
+            background: #666;
+            color: #fff;
+            padding: 14px 35px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .cancel-form-button:hover {
+            background: #555;
+            transform: translateY(-2px);
+        }
+        .data-list-section {
+            margin-top: 30px;
+        }
+        .data-list-section h4 {
+            margin-bottom: 20px;
+            color: #1B7560;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+        }
+        .empty-state p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* Dashboard Layout */
+        .dashboard-wrapper {
+            display: flex;
+            gap: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+        .dashboard-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1B7560 0%, #135243 100%);
+            border-radius: 12px;
+            padding: 25px 0;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 4px 20px rgba(27, 117, 96, 0.3);
+        }
+        .dashboard-sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .dashboard-sidebar-menu li {
+            margin: 0;
+        }
+        .dashboard-sidebar-menu .menu-divider {
+            margin: 20px 0;
+            padding: 0 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .dashboard-sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            border-right: 4px solid transparent;
+            position: relative;
+        }
+        .dashboard-sidebar-menu a::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: rgba(255, 255, 255, 0.15);
+            transition: width 0.3s ease;
+        }
+        .dashboard-sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding-right: 30px;
+        }
+        .dashboard-sidebar-menu a:hover::before {
+            width: 4px;
+        }
+        .dashboard-sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-right-color: #d8a51c;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard-sidebar-menu a.active::before {
+            width: 4px;
+            background: #d8a51c;
+        }
+        .dashboard-main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            .dashboard-sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+            }
+            .dashboard-sidebar-menu {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 15px;
+            }
+            .dashboard-sidebar-menu li {
+                flex: 1 1 auto;
+            }
+            .dashboard-sidebar-menu a {
+                padding: 12px 15px;
+                border-radius: 8px;
+                border-right: none;
+                border-bottom: 3px solid transparent;
+            }
+            .dashboard-sidebar-menu a.active {
+                border-right: none;
+                border-bottom-color: #d8a51c;
+            }
+            .dashboard-sidebar-menu .menu-divider {
+                width: 100%;
+                margin: 10px 0;
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
@@ -272,46 +675,18 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
                 <?php echo esc_html( $success_message ); ?>
             </div>
         <?php endif; ?>
+        <?php if ( $error_message ) : ?>
+            <div class="error-message" style="background: #fee; color: #c33; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #fcc;">
+                <?php echo esc_html( $error_message ); ?>
+            </div>
+        <?php endif; ?>
         
-        <div class="quick-links">
-            <div class="quick-link-card">
-                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=book' ) ); ?>" target="_blank">
-                    📚 <?php _e( 'إدارة الكتب', 'sheikh-bassam-kayed' ); ?>
-                </a>
-            </div>
-            <div class="quick-link-card">
-                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=audio_lecture' ) ); ?>" target="_blank">
-                    🎤 <?php _e( 'إدارة المحاضرات الصوتية', 'sheikh-bassam-kayed' ); ?>
-                </a>
-            </div>
-            <div class="quick-link-card">
-                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=friday_khutbah' ) ); ?>" target="_blank">
-                    📿 <?php _e( 'إدارة خطب الجمعة', 'sheikh-bassam-kayed' ); ?>
-                </a>
-            </div>
-            <div class="quick-link-card">
-                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=video' ) ); ?>" target="_blank">
-                    🎥 <?php _e( 'إدارة الفيديوهات', 'sheikh-bassam-kayed' ); ?>
-                </a>
-            </div>
-            <div class="quick-link-card">
-                <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=gallery' ) ); ?>" target="_blank">
-                    🖼️ <?php _e( 'إدارة المعرض', 'sheikh-bassam-kayed' ); ?>
-                </a>
-            </div>
-        </div>
-        
-        <div class="dashboard-tabs">
-            <button class="dashboard-tab active" data-tab="hero"><?php _e( 'قسم البطل', 'sheikh-bassam-kayed' ); ?></button>
-            <button class="dashboard-tab" data-tab="about"><?php _e( 'صفحة من نحن', 'sheikh-bassam-kayed' ); ?></button>
-            <button class="dashboard-tab" data-tab="contact"><?php _e( 'صفحة اتصل بنا', 'sheikh-bassam-kayed' ); ?></button>
-            <button class="dashboard-tab" data-tab="social"><?php _e( 'التواصل الاجتماعي', 'sheikh-bassam-kayed' ); ?></button>
-            <button class="dashboard-tab" data-tab="whatsapp"><?php _e( 'واتساب', 'sheikh-bassam-kayed' ); ?></button>
-        </div>
-        
+        <div class="dashboard-wrapper">
+            <!-- Main Content Area -->
+            <div class="dashboard-main-content">
         <div class="dashboard-content">
             <!-- Hero Section Tab -->
-            <div class="tab-content active" id="hero-tab">
+            <div class="tab-content <?php echo $active_tab === 'hero' ? 'active' : ''; ?>" id="hero-tab">
                 <form method="post">
                     <?php wp_nonce_field( 'update_hero_settings', 'hero_settings_nonce' ); ?>
                     <div class="form-section">
@@ -354,7 +729,7 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
             </div>
             
             <!-- About Page Tab -->
-            <div class="tab-content" id="about-tab">
+            <div class="tab-content <?php echo $active_tab === 'about' ? 'active' : ''; ?>" id="about-tab">
                 <form method="post">
                     <?php wp_nonce_field( 'update_about_settings', 'about_settings_nonce' ); ?>
                     <div class="form-section">
@@ -384,7 +759,7 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
             </div>
             
             <!-- Contact Page Tab -->
-            <div class="tab-content" id="contact-tab">
+            <div class="tab-content <?php echo $active_tab === 'contact' ? 'active' : ''; ?>" id="contact-tab">
                 <form method="post">
                     <?php wp_nonce_field( 'update_contact_settings', 'contact_settings_nonce' ); ?>
                     <div class="form-section">
@@ -401,7 +776,7 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
             </div>
             
             <!-- Social Media Tab -->
-            <div class="tab-content" id="social-tab">
+            <div class="tab-content <?php echo $active_tab === 'social' ? 'active' : ''; ?>" id="social-tab">
                 <form method="post">
                     <?php wp_nonce_field( 'update_social_settings', 'social_settings_nonce' ); ?>
                     <div class="form-section">
@@ -438,7 +813,7 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
             </div>
             
             <!-- WhatsApp Tab -->
-            <div class="tab-content" id="whatsapp-tab">
+            <div class="tab-content <?php echo $active_tab === 'whatsapp' ? 'active' : ''; ?>" id="whatsapp-tab">
                 <form method="post">
                     <?php wp_nonce_field( 'update_whatsapp_settings', 'whatsapp_settings_nonce' ); ?>
                     <div class="form-section">
@@ -457,10 +832,49 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
                     </div>
                 </form>
             </div>
+            
+            <?php
+            // Include CRUD tabs for post types
+            include get_template_directory() . '/inc/dashboard-crud-tabs.php';
+            ?>
+        </div>
+            </div>
+            
+            <!-- Sidebar Navigation (Right Side) -->
+            <aside class="dashboard-sidebar">
+                <ul class="dashboard-sidebar-menu">
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/hero' ) ); ?>" class="<?php echo $active_tab === 'hero' ? 'active' : ''; ?>"><?php _e( 'قسم البطل', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/about' ) ); ?>" class="<?php echo $active_tab === 'about' ? 'active' : ''; ?>"><?php _e( 'صفحة من نحن', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/contact' ) ); ?>" class="<?php echo $active_tab === 'contact' ? 'active' : ''; ?>"><?php _e( 'صفحة اتصل بنا', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/social' ) ); ?>" class="<?php echo $active_tab === 'social' ? 'active' : ''; ?>"><?php _e( 'التواصل الاجتماعي', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/whatsapp' ) ); ?>" class="<?php echo $active_tab === 'whatsapp' ? 'active' : ''; ?>"><?php _e( 'واتساب', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li class="menu-divider"><?php _e( 'إدارة المحتوى', 'sheikh-bassam-kayed' ); ?></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/books' ) ); ?>" class="<?php echo $active_tab === 'books' ? 'active' : ''; ?>">📚 <?php _e( 'الكتب', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/audio' ) ); ?>" class="<?php echo $active_tab === 'audio' ? 'active' : ''; ?>">🎤 <?php _e( 'المحاضرات الصوتية', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/khutbahs' ) ); ?>" class="<?php echo $active_tab === 'khutbahs' ? 'active' : ''; ?>">📿 <?php _e( 'خطب الجمعة', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/videos' ) ); ?>" class="<?php echo $active_tab === 'videos' ? 'active' : ''; ?>">🎥 <?php _e( 'الفيديوهات', 'sheikh-bassam-kayed' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/dashboard/gallery' ) ); ?>" class="<?php echo $active_tab === 'gallery' ? 'active' : ''; ?>">🖼️ <?php _e( 'المعرض', 'sheikh-bassam-kayed' ); ?></a></li>
+                </ul>
+            </aside>
         </div>
     </div>
     
     <script>
+        // Initialize active tab from URL or default
+        var activeTab = '<?php echo esc_js( $active_tab ); ?>';
+        
+        // Set active tab on page load
+        if (activeTab) {
+            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            var activeTabButton = document.querySelector('.dashboard-tab[data-tab="' + activeTab + '"]');
+            var activeTabContent = document.getElementById(activeTab + '-tab');
+            
+            if (activeTabButton) activeTabButton.classList.add('active');
+            if (activeTabContent) activeTabContent.classList.add('active');
+        }
+        
         // Tab switching
         document.querySelectorAll('.dashboard-tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -525,7 +939,125 @@ $social_linkedin = get_theme_mod( 'social_linkedin', '' );
                 button.remove();
             });
             
+            // File upload button handler (PDF, Audio, Video)
+            $('.file-upload-button').on('click', function(e) {
+                e.preventDefault();
+                
+                var button = $(this);
+                var targetInput = button.data('target');
+                var fileType = button.data('type');
+                
+                // Map file types to mime types
+                var mimeTypes = {
+                    'application/pdf': ['application/pdf'],
+                    'audio': ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3'],
+                    'video': ['video/mp4', 'video/webm', 'video/ogg']
+                };
+                
+                var libraryType = mimeTypes[fileType] || null;
+                
+                // Create media frame
+                var frameOptions = {
+                    title: 'اختر ملف',
+                    button: {
+                        text: 'استخدم هذا الملف'
+                    },
+                    multiple: false
+                };
+                
+                if (libraryType) {
+                    frameOptions.library = {
+                        type: libraryType
+                    };
+                }
+                
+                var frame = wp.media(frameOptions);
+                
+                // When file is selected
+                frame.on('select', function() {
+                    var attachment = frame.state().get('selection').first().toJSON();
+                    $('#' + targetInput).val(attachment.url);
+                });
+                
+                // Open media frame
+                frame.open();
+            });
+            
         })(jQuery);
+        
+        // CRUD Form Toggle Functionality
+        (function() {
+            // Check if we're in edit mode (URL has ?edit= parameter)
+            var urlParams = new URLSearchParams(window.location.search);
+            var editId = urlParams.get('edit');
+            
+            // Show form if in edit mode
+            if (editId) {
+                var activeTab = '<?php echo esc_js( $active_tab ); ?>';
+                var formId = activeTab + '-form';
+                var formWrapper = document.getElementById(formId);
+                if (formWrapper) {
+                    formWrapper.classList.add('show');
+                    // Scroll to form
+                    setTimeout(function() {
+                        formWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
+            }
+            
+            // Add New Button - Show Form
+            document.querySelectorAll('.add-new-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var formId = this.getAttribute('data-form');
+                    var formWrapper = document.getElementById(formId);
+                    if (formWrapper) {
+                        formWrapper.classList.add('show');
+                        // Scroll to form
+                        setTimeout(function() {
+                            formWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }, 100);
+                    }
+                });
+            });
+            
+            // Close Form Button
+            document.querySelectorAll('.close-form-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var formId = this.getAttribute('data-form');
+                    var formWrapper = document.getElementById(formId);
+                    if (formWrapper) {
+                        formWrapper.classList.remove('show');
+                        // Clear form if not in edit mode
+                        var urlParams = new URLSearchParams(window.location.search);
+                        if (!urlParams.get('edit')) {
+                            var form = formWrapper.querySelector('form');
+                            if (form) {
+                                form.reset();
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Cancel Form Button
+            document.querySelectorAll('.cancel-form-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var formId = this.getAttribute('data-form');
+                    var tab = this.getAttribute('data-tab');
+                    var formWrapper = document.getElementById(formId);
+                    if (formWrapper) {
+                        formWrapper.classList.remove('show');
+                        // Redirect to clean URL (remove edit parameter)
+                        var baseUrl = window.location.pathname;
+                        if (tab) {
+                            window.location.href = baseUrl.split('/').slice(0, -1).join('/') + '/' + tab;
+                        } else {
+                            window.location.href = baseUrl.split('?')[0];
+                        }
+                    }
+                });
+            });
+        })();
     </script>
     <?php wp_footer(); ?>
 </body>

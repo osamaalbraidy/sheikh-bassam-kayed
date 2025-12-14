@@ -259,10 +259,19 @@ function sheikh_bassam_kayed_set_homepage() {
     // Create essential pages if they don't exist
     sheikh_bassam_kayed_create_essential_pages();
     
-    // Flush rewrite rules to ensure URLs work correctly
+    // Flush rewrite rules to ensure URLs work correctly (including dashboard routes)
     flush_rewrite_rules();
 }
 add_action( 'after_switch_theme', 'sheikh_bassam_kayed_set_homepage' );
+
+// Flush rewrite rules when dashboard rewrite rules are added
+function sheikh_bassam_kayed_flush_rewrite_rules_on_init() {
+    if ( get_option( 'sheikh_bassam_kayed_flush_rewrite_rules' ) ) {
+        flush_rewrite_rules();
+        delete_option( 'sheikh_bassam_kayed_flush_rewrite_rules' );
+    }
+}
+add_action( 'init', 'sheikh_bassam_kayed_flush_rewrite_rules_on_init', 20 );
 
 // Create essential pages (About, Contact)
 function sheikh_bassam_kayed_create_essential_pages() {
@@ -377,6 +386,26 @@ require_once get_template_directory() . '/inc/dashboard-auth.php';
 
 // Include Dashboard Management
 require_once get_template_directory() . '/inc/dashboard-manager.php';
+
+// Include Dashboard CRUD
+require_once get_template_directory() . '/inc/dashboard-crud.php';
+
+// Add rewrite rules for dashboard routes
+function sheikh_bassam_kayed_add_dashboard_rewrite_rules() {
+    add_rewrite_rule( '^dashboard/([^/]+)/?$', 'index.php?pagename=dashboard&dashboard_tab=$matches[1]', 'top' );
+    // Set flag to flush on next init
+    if ( ! get_option( 'sheikh_bassam_kayed_flush_rewrite_rules' ) ) {
+        add_option( 'sheikh_bassam_kayed_flush_rewrite_rules', true );
+    }
+}
+add_action( 'init', 'sheikh_bassam_kayed_add_dashboard_rewrite_rules' );
+
+// Add query var for dashboard tab
+function sheikh_bassam_kayed_add_dashboard_query_vars( $vars ) {
+    $vars[] = 'dashboard_tab';
+    return $vars;
+}
+add_filter( 'query_vars', 'sheikh_bassam_kayed_add_dashboard_query_vars' );
 
 // Add Hero Section Customizer Option
 function sheikh_bassam_kayed_customize_register( $wp_customize ) {

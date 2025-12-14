@@ -70,11 +70,31 @@ function sheikh_bassam_kayed_dashboard_logout() {
 }
 add_action( 'template_redirect', 'sheikh_bassam_kayed_dashboard_logout' );
 
-// Protect dashboard page
+// Protect dashboard pages
 function sheikh_bassam_kayed_protect_dashboard() {
-    if ( is_page( 'dashboard' ) && ! sheikh_bassam_kayed_is_dashboard_authenticated() ) {
-        wp_safe_redirect( home_url( '/dashboard-login' ) );
-        exit;
+    // Check if it's a dashboard page
+    $dashboard_pages = array( 'dashboard', 'dashboard-hero', 'dashboard-about', 'dashboard-contact', 'dashboard-social', 'dashboard-whatsapp', 'dashboard-books', 'dashboard-audio', 'dashboard-khutbahs', 'dashboard-videos', 'dashboard-gallery' );
+    
+    $current_page = get_queried_object();
+    if ( $current_page && isset( $current_page->post_name ) ) {
+        $page_slug = $current_page->post_name;
+        
+        // Check if it's a dashboard page
+        if ( in_array( $page_slug, $dashboard_pages ) || strpos( $page_slug, 'dashboard' ) === 0 ) {
+            if ( ! sheikh_bassam_kayed_is_dashboard_authenticated() ) {
+                wp_safe_redirect( home_url( '/dashboard-login' ) );
+                exit;
+            }
+        }
+    }
+    
+    // Also check URL pattern for /dashboard/* routes
+    $request_uri = $_SERVER['REQUEST_URI'];
+    if ( strpos( $request_uri, '/dashboard/' ) !== false && strpos( $request_uri, '/dashboard-login' ) === false ) {
+        if ( ! sheikh_bassam_kayed_is_dashboard_authenticated() ) {
+            wp_safe_redirect( home_url( '/dashboard-login' ) );
+            exit;
+        }
     }
 }
 add_action( 'template_redirect', 'sheikh_bassam_kayed_protect_dashboard' );
