@@ -15,13 +15,32 @@ add_action( 'init', 'sheikh_bassam_kayed_start_session' );
 
 // Create custom dashboard user role (only admin can manage)
 function sheikh_bassam_kayed_create_dashboard_role() {
+    // Get existing users before removing role
+    $existing_users = array();
+    if ( get_role( 'dashboard_user' ) ) {
+        $existing_users = get_users( array( 'role' => 'dashboard_user' ) );
+        remove_role( 'dashboard_user' );
+    }
+    
     add_role(
         'dashboard_user',
         __( 'مستخدم لوحة التحكم', 'sheikh-bassam-kayed' ),
         array(
             'read' => true,
+            'upload_files' => true, // Required for media uploader
+            'edit_posts' => true, // Required for managing content
+            'edit_published_posts' => true,
+            'publish_posts' => true,
+            'delete_posts' => true,
+            'delete_published_posts' => true,
         )
     );
+    
+    // Re-assign role to existing users (WordPress should handle this automatically, but we'll ensure it)
+    foreach ( $existing_users as $user ) {
+        $user_obj = new WP_User( $user->ID );
+        $user_obj->set_role( 'dashboard_user' );
+    }
 }
 add_action( 'init', 'sheikh_bassam_kayed_create_dashboard_role' );
 
@@ -39,6 +58,11 @@ function sheikh_bassam_kayed_dashboard_login() {
             if ( in_array( 'dashboard_user', $user_roles ) || in_array( 'administrator', $user_roles ) ) {
                 $_SESSION['dashboard_authenticated'] = true;
                 $_SESSION['dashboard_user_id'] = $user->ID;
+                
+                // Also log the user into WordPress (required for media uploader AJAX)
+                wp_set_current_user( $user->ID );
+                wp_set_auth_cookie( $user->ID, true );
+                
                 wp_safe_redirect( home_url( '/dashboard/hero' ) );
                 exit;
             } else {
@@ -63,12 +87,36 @@ function sheikh_bassam_kayed_dashboard_logout() {
             unset( $_SESSION['dashboard_authenticated'] );
             unset( $_SESSION['dashboard_user_id'] );
             session_destroy();
+            
+            // Also log out from WordPress
+            wp_logout();
+            
             wp_safe_redirect( home_url( '/dashboard-login' ) );
             exit;
         }
     }
 }
 add_action( 'template_redirect', 'sheikh_bassam_kayed_dashboard_logout' );
+
+// Set WordPress user for dashboard sessions (required for media uploader AJAX)
+// This filter runs early and allows WordPress to recognize the user for AJAX requests
+function sheikh_bassam_kayed_set_dashboard_user_for_wordpress( $user_id ) {
+    // If WordPress already determined a user, use that
+    if ( $user_id ) {
+        return $user_id;
+    }
+    
+    // Otherwise, check if user is authenticated via dashboard session
+    if ( sheikh_bassam_kayed_is_dashboard_authenticated() && isset( $_SESSION['dashboard_user_id'] ) ) {
+        $dashboard_user_id = intval( $_SESSION['dashboard_user_id'] );
+        if ( $dashboard_user_id > 0 ) {
+            return $dashboard_user_id;
+        }
+    }
+    
+    return $user_id;
+}
+add_filter( 'determine_current_user', 'sheikh_bassam_kayed_set_dashboard_user_for_wordpress', 20 );
 
 // Protect dashboard pages
 function sheikh_bassam_kayed_protect_dashboard() {
@@ -112,6 +160,19 @@ function sheikh_bassam_kayed_protect_dashboard() {
     }
 }
 add_action( 'template_redirect', 'sheikh_bassam_kayed_protect_dashboard', 5 );
+
+// Prevent dashboard users from accessing WordPress admin (they should use custom dashboard)
+function sheikh_bassam_kayed_prevent_dashboard_user_admin_access() {
+    if ( is_admin() && ! wp_doing_ajax() ) {
+        $current_user = wp_get_current_user();
+        if ( $current_user && in_array( 'dashboard_user', $current_user->roles ) && ! current_user_can( 'manage_options' ) ) {
+            // Redirect to custom dashboard instead
+            wp_safe_redirect( home_url( '/dashboard/hero' ) );
+            exit;
+        }
+    }
+}
+add_action( 'admin_init', 'sheikh_bassam_kayed_prevent_dashboard_user_admin_access', 1 );
 
 // Admin page to create dashboard users
 function sheikh_bassam_kayed_add_dashboard_user_admin_page() {
