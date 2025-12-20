@@ -1,0 +1,36 @@
+# WordPress uploads directory
+wp-content/uploads/
+
+# WordPress core files (optional - uncomment if you don't want to track core)
+# wp-admin/
+# wp-includes/
+# wp-*.php
+# xmlrpc.php
+# license.txt
+# readme.html
+
+# WordPress configuration
+wp-config.php
+
+# Other common ignores
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node modules (if using npm)
+node_modules/
+
+# Environment files
+.env
+.env.local
+

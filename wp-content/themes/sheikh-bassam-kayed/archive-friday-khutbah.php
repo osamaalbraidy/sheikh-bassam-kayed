@@ -9,48 +9,173 @@ get_header();
 ?>
 
 <main class="site-main">
-    <div class="content-area">
-        <header class="archive-header">
-            <h1><?php post_type_archive_title(); ?></h1>
+    <div class="content-area archive-page">
+        <!-- Archive Header -->
+        <header class="archive-header-creative">
+            <div class="archive-header-content">
+                <div class="archive-icon">🕌</div>
+                <h1 class="archive-title"><?php post_type_archive_title(); ?></h1>
+                <p class="archive-description"><?php _e( 'اقرأ خطب الجمعة المميزة', 'sheikh-bassam-kayed' ); ?></p>
+            </div>
         </header>
         
-        <?php
-        if ( have_posts() ) {
-            while ( have_posts() ) {
-                the_post();
-                $khutbah_date = get_post_meta( get_the_ID(), '_khutbah_date', true );
-                ?>
-                <article class="post-item">
-                    <header class="entry-header">
-                        <h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
-                        <div class="post-meta">
-                            <?php if ( $khutbah_date ) : ?>
-                                <span><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $khutbah_date ) ) ); ?></span>
-                            <?php else : ?>
-                                <span><?php echo get_the_date(); ?></span>
+        <!-- Khutbahs Grid -->
+        <div class="khutbah-cards-grid archive-grid">
+            <?php
+            if ( have_posts() ) {
+                while ( have_posts() ) {
+                    the_post();
+                    $khutbah_date = get_post_meta( get_the_ID(), '_khutbah_date', true );
+                    ?>
+                    <div class="khutbah-card-creative">
+                        <div class="khutbah-content">
+                            <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+                            <?php if ( has_excerpt() ) : ?>
+                                <div class="khutbah-excerpt"><?php the_excerpt(); ?></div>
                             <?php endif; ?>
+                            <a href="<?php the_permalink(); ?>" class="khutbah-read-btn">اقرأ الخطبة كاملة →</a>
                         </div>
-                    </header>
-                    
-                    <div class="entry-content">
-                        <?php the_excerpt(); ?>
-                        <a href="<?php the_permalink(); ?>" class="read-more">اقرأ الخطبة كاملة</a>
                     </div>
-                </article>
+                    <?php
+                }
+            } else {
+                ?>
+                <div class="no-content-message">
+                    <div class="no-content-icon">🕌</div>
+                    <p><?php _e( 'لا توجد خطب في هذا الأرشيف.', 'sheikh-bassam-kayed' ); ?></p>
+                </div>
                 <?php
             }
-            
-            // Pagination
-            the_posts_pagination();
-        } else {
             ?>
-            <p><?php _e( 'لا توجد خطب في هذا الأرشيف.', 'sheikh-bassam-kayed' ); ?></p>
-            <?php
-        }
-        ?>
+        </div>
+        
+        <!-- Pagination -->
+        <?php if ( have_posts() ) : ?>
+            <div class="archive-pagination">
+                <?php
+                the_posts_pagination( array(
+                    'mid_size'  => 2,
+                    'prev_text' => __( '← السابق', 'sheikh-bassam-kayed' ),
+                    'next_text' => __( 'التالي →', 'sheikh-bassam-kayed' ),
+                ) );
+                ?>
+            </div>
+        <?php endif; ?>
     </div>
 </main>
 
+<style>
+.archive-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.archive-header-creative {
+    background: linear-gradient(135deg, #1B7560 0%, #135243 100%);
+    border-radius: 20px;
+    padding: 60px 40px;
+    margin-bottom: 50px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(27, 117, 96, 0.3);
+}
+
+.archive-header-content {
+    color: #fff;
+}
+
+.archive-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.archive-title {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.archive-description {
+    font-size: 18px;
+    color: rgba(255,255,255,0.9);
+    margin: 0;
+}
+
+.archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.no-content-message {
+    text-align: center;
+    padding: 80px 20px;
+    grid-column: 1 / -1;
+}
+
+.no-content-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.no-content-message p {
+    font-size: 20px;
+    color: #666;
+}
+
+.archive-pagination {
+    margin-top: 50px;
+    text-align: center;
+}
+
+.archive-pagination .nav-links {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.archive-pagination .page-numbers {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #fff;
+    color: #1B7560;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.archive-pagination .page-numbers:hover,
+.archive-pagination .page-numbers.current {
+    background: linear-gradient(135deg, #1B7560 0%, #135243 100%);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(27, 117, 96, 0.3);
+}
+
+@media (max-width: 768px) {
+    .archive-header-creative {
+        padding: 40px 20px;
+    }
+    
+    .archive-title {
+        font-size: 32px;
+    }
+    
+    .archive-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+</style>
+
 <?php
 get_footer();
-

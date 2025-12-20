@@ -1792,6 +1792,32 @@ h1, h2, h3, h4, h5, h6 {
         grid-template-columns: 1fr;
         gap: 20px;
     }
+    
+    .khutbah-card-creative {
+        padding: 20px;
+        border-right: none;
+        border-bottom: 4px solid #d8a51c;
+    }
+    
+    .khutbah-content {
+        width: 100%;
+    }
+    
+    .khutbah-content h3 {
+        font-size: 18px;
+        text-align: center;
+    }
+    
+    .khutbah-excerpt {
+        text-align: center;
+        font-size: 14px;
+    }
+    
+    .khutbah-read-btn {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+    }
 }
 
 .khutbah-card-creative {
@@ -1799,10 +1825,12 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 12px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    display: flex;
-    gap: 25px;
     transition: all 0.3s ease;
     border-right: 4px solid #d8a51c;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .khutbah-card-creative:hover {

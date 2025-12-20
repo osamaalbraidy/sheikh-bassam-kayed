@@ -515,3 +515,25 @@ function sheikh_bassam_kayed_add_dropdown_arrow( $item_output, $item, $depth, $a
     return $item_output;
 }
 
+/**
+ * Get Arabic month abbreviation
+ */
+function sheikh_bassam_kayed_get_arabic_month_abbr( $month_number ) {
+    $arabic_months = array(
+        '01' => 'يناير',
+        '02' => 'فبراير',
+        '03' => 'مارس',
+        '04' => 'أبريل',
+        '05' => 'مايو',
+        '06' => 'يونيو',
+        '07' => 'يوليو',
+        '08' => 'أغسطس',
+        '09' => 'سبتمبر',
+        '10' => 'أكتوبر',
+        '11' => 'نوفمبر',
+        '12' => 'ديسمبر',
+    );
+    
+    return isset( $arabic_months[ $month_number ] ) ? $arabic_months[ $month_number ] : '';
+}
+

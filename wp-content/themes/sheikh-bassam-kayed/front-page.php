@@ -69,7 +69,7 @@ get_header();
                 <?php
                 $books_query = new WP_Query( array(
                     'post_type' => 'book',
-                    'posts_per_page' => 10,
+                    'posts_per_page' => 3,
                     'orderby' => 'rand',
                 ) );
                 
@@ -137,7 +137,7 @@ get_header();
                 <?php
                 $audio_query = new WP_Query( array(
                     'post_type' => 'audio_lecture',
-                    'posts_per_page' => 10,
+                    'posts_per_page' => 3,
                     'orderby' => 'rand',
                 ) );
                 
@@ -201,7 +201,7 @@ get_header();
                 <?php
                 $videos_query = new WP_Query( array(
                     'post_type' => 'video',
-                    'posts_per_page' => 10,
+                    'posts_per_page' => 3,
                     'orderby' => 'rand',
                 ) );
                 
@@ -262,7 +262,7 @@ get_header();
                 <?php
                 $khutbahs_query = new WP_Query( array(
                     'post_type' => 'friday_khutbah',
-                    'posts_per_page' => 10,
+                    'posts_per_page' => 3,
                     'orderby' => 'rand',
                 ) );
                 
@@ -272,15 +272,6 @@ get_header();
                         $khutbah_date = get_post_meta( get_the_ID(), '_khutbah_date', true );
                         ?>
                         <div class="khutbah-card-creative">
-                            <div class="khutbah-date-badge">
-                                <?php if ( $khutbah_date ) : ?>
-                                    <span class="date-day"><?php echo esc_html( date_i18n( 'd', strtotime( $khutbah_date ) ) ); ?></span>
-                                    <span class="date-month"><?php echo esc_html( date_i18n( 'M', strtotime( $khutbah_date ) ) ); ?></span>
-                                <?php else : ?>
-                                    <span class="date-day"><?php echo get_the_date( 'd' ); ?></span>
-                                    <span class="date-month"><?php echo get_the_date( 'M' ); ?></span>
-                                <?php endif; ?>
-                            </div>
                             <div class="khutbah-content">
                                 <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
                                 <div class="khutbah-excerpt"><?php the_excerpt(); ?></div>
@@ -314,7 +305,7 @@ get_header();
                 <?php
                 $gallery_query = new WP_Query( array(
                     'post_type' => 'gallery',
-                    'posts_per_page' => 10,
+                    'posts_per_page' => 3,
                     'orderby' => 'rand',
                 ) );
                 

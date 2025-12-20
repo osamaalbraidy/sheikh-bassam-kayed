@@ -1,6 +1,6 @@
 <?php
 /**
- * The template for displaying video archives
+ * The template for displaying Friday Khutbah archives
  *
  * @package Sheikh_Bassam_Kayed
  */
@@ -13,45 +13,27 @@ get_header();
         <!-- Archive Header -->
         <header class="archive-header-creative">
             <div class="archive-header-content">
-                <div class="archive-icon">🎬</div>
+                <div class="archive-icon">🕌</div>
                 <h1 class="archive-title"><?php post_type_archive_title(); ?></h1>
-                <p class="archive-description"><?php _e( 'شاهد مجموعة الفيديوهات الإسلامية والتعليمية', 'sheikh-bassam-kayed' ); ?></p>
+                <p class="archive-description"><?php _e( 'اقرأ خطب الجمعة المميزة', 'sheikh-bassam-kayed' ); ?></p>
             </div>
         </header>
         
-        <!-- Videos Grid -->
-        <div class="videos-grid-creative archive-grid">
+        <!-- Khutbahs Grid -->
+        <div class="khutbah-cards-grid archive-grid">
             <?php
             if ( have_posts() ) {
                 while ( have_posts() ) {
                     the_post();
-                    $video_url = get_post_meta( get_the_ID(), '_video_url', true );
-                    $video_date = get_post_meta( get_the_ID(), '_video_date', true );
+                    $khutbah_date = get_post_meta( get_the_ID(), '_khutbah_date', true );
                     ?>
-                    <div class="video-card-creative">
-                        <div class="video-thumb-wrapper">
-                            <?php if ( has_post_thumbnail() ) : ?>
-                                <a href="<?php the_permalink(); ?>" class="video-thumb-link">
-                                    <?php the_post_thumbnail( 'video-thumb', array( 'class' => 'video-thumb-creative' ) ); ?>
-                                    <div class="play-overlay">
-                                        <div class="play-button">▶</div>
-                                    </div>
-                                </a>
-                            <?php endif; ?>
-                        </div>
-                        <div class="video-card-content">
+                    <div class="khutbah-card-creative">
+                        <div class="khutbah-content">
                             <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-                            <div class="video-meta">
-                                <?php if ( $video_date ) : ?>
-                                    <span><i>📅</i> <?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $video_date ) ) ); ?></span>
-                                <?php else : ?>
-                                    <span><i>📅</i> <?php echo get_the_date(); ?></span>
-                                <?php endif; ?>
-                            </div>
                             <?php if ( has_excerpt() ) : ?>
-                                <div class="video-excerpt"><?php the_excerpt(); ?></div>
+                                <div class="khutbah-excerpt"><?php the_excerpt(); ?></div>
                             <?php endif; ?>
-                            <a href="<?php the_permalink(); ?>" class="video-watch-btn">شاهد الفيديو →</a>
+                            <a href="<?php the_permalink(); ?>" class="khutbah-read-btn">اقرأ الخطبة كاملة →</a>
                         </div>
                     </div>
                     <?php
@@ -59,8 +41,8 @@ get_header();
             } else {
                 ?>
                 <div class="no-content-message">
-                    <div class="no-content-icon">🎬</div>
-                    <p><?php _e( 'لا توجد فيديوهات في هذا الأرشيف.', 'sheikh-bassam-kayed' ); ?></p>
+                    <div class="no-content-icon">🕌</div>
+                    <p><?php _e( 'لا توجد خطب في هذا الأرشيف.', 'sheikh-bassam-kayed' ); ?></p>
                 </div>
                 <?php
             }
@@ -129,6 +111,89 @@ get_header();
     margin-bottom: 50px;
 }
 
+.khutbah-card-creative {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border-right: 4px solid #d8a51c;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.khutbah-card-creative:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 8px 25px rgba(27, 117, 96, 0.15);
+}
+
+.khutbah-date-badge {
+    background: linear-gradient(135deg, #1B7560, #135243);
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(27, 117, 96, 0.3);
+}
+
+.date-day {
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1;
+    display: block;
+}
+
+.date-month {
+    font-size: 14px;
+    margin-top: 5px;
+    opacity: 0.9;
+}
+
+.khutbah-content {
+    flex: 1;
+}
+
+.khutbah-content h3 {
+    margin: 0 0 15px 0;
+    font-size: 22px;
+}
+
+.khutbah-content h3 a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.khutbah-content h3 a:hover {
+    color: #1B7560;
+}
+
+.khutbah-excerpt {
+    color: #555;
+    line-height: 1.8;
+    margin: 15px 0;
+}
+
+.khutbah-read-btn {
+    display: inline-block;
+    color: #1B7560;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.khutbah-read-btn:hover {
+    color: #135243;
+    transform: translateX(-5px);
+}
+
 .no-content-message {
     text-align: center;
     padding: 80px 20px;
@@ -191,6 +256,36 @@ get_header();
     .archive-grid {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+    
+    .archive-page {
+        padding: 20px 15px;
+    }
+    
+    .khutbah-card-creative {
+        padding: 20px;
+        border-right: none;
+        border-bottom: 4px solid #d8a51c;
+    }
+    
+    .khutbah-content {
+        width: 100%;
+    }
+    
+    .khutbah-content h3 {
+        font-size: 18px;
+        text-align: center;
+    }
+    
+    .khutbah-excerpt {
+        text-align: center;
+        font-size: 14px;
+    }
+    
+    .khutbah-read-btn {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
     }
 }
 </style>
