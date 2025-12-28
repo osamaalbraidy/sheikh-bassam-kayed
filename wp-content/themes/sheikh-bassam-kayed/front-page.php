@@ -14,47 +14,31 @@ get_header();
         <?php
         $hero_image = get_theme_mod( 'hero_image', '' );
         $hero_image_mobile = get_theme_mod( 'hero_image_mobile', '' );
-        
-        if ( $hero_image ) :
-            // Use ratio 1160:283 (24.4%)
-            $aspect_ratio = 24.4; // 1160:283 ratio
-            ?>
-            <div class="hero-image-container" style="--aspect-ratio: <?php echo esc_attr( $aspect_ratio ); ?>%;">
-                <?php if ( $hero_image_mobile ) : ?>
-                    <!-- Desktop/Tablet Image -->
-                    <img src="<?php echo esc_url( $hero_image ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="hero-image hero-image-desktop" />
-                    <!-- Mobile Image -->
-                    <img src="<?php echo esc_url( $hero_image_mobile ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="hero-image hero-image-mobile" />
-                <?php else : ?>
-                    <!-- Single Image for All Devices -->
-                    <img src="<?php echo esc_url( $hero_image ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="hero-image" />
-                <?php endif; ?>
-                <div class="hero-overlay">
-                    <div class="hero-content">
-                        <h1 class="hero-logo-text">الشّيخ بسّام كايد</h1>
-                        <div class="hero-intro">
-                            <?php
-                            $hero_text = get_theme_mod( 'hero_intro_text', __( 'موقع إسلامي يقدم المحاضرات، الكتب، الفتاوى، والمواد التعليمية الإسلامية', 'sheikh-bassam-kayed' ) );
-                            echo wp_kses_post( $hero_text );
-                            ?>
-                        </div>
-                    </div>
+        ?>
+        <div class="hero-banner-container">
+            <div class="hero-banner-content">
+            <div class="hero-image-section">
+                    <?php if ( $hero_image ) : ?>
+                        <?php if ( $hero_image_mobile ) : ?>
+                            <img src="<?php echo esc_url( $hero_image ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="hero-banner-image hero-image-desktop" />
+                            <img src="<?php echo esc_url( $hero_image_mobile ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="hero-banner-image hero-image-mobile" />
+                        <?php else : ?>
+                            <img src="<?php echo esc_url( $hero_image ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="hero-banner-image" />
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </div>
-            </div>
-        <?php else : ?>
-            <!-- Fallback div with aspect ratio 1160:283 -->
-            <div class="hero-image-container hero-fallback" style="--aspect-ratio: 24.4%;">
-                <div class="hero-content">
-                    <h1 class="hero-logo-text">الشّيخ بسّام كايد</h1>
+                <div class="hero-text-section">
+                    <h1 class="hero-logo-text">الشيخ د. بسام كايد</h1>
                     <div class="hero-intro">
                         <?php
-                        $hero_text = get_theme_mod( 'hero_intro_text', __( 'موقع إسلامي يقدم المحاضرات، الكتب، الفتاوى، والمواد التعليمية الإسلامية', 'sheikh-bassam-kayed' ) );
+                        $hero_text = get_theme_mod( 'hero_intro_text', __( 'موقع إسلامي يقدم المحاضرات، الكتب، والمواد التعليمية الإسلامية', 'sheikh-bassam-kayed' ) );
                         echo wp_kses_post( $hero_text );
                         ?>
                     </div>
                 </div>
+
             </div>
-        <?php endif; ?>
+        </div>
     </section>
     
     <div class="content-area">

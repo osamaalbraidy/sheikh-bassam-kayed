@@ -19,7 +19,7 @@
             } else {
                 ?>
                 <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-logo" rel="home">
-                    <span class="logo-text">الشّيخ بسّام كايد</span>
+                    <span class="logo-text">الشّيخ د. بسّام كايد</span>
                 </a>
                 <?php
             }
