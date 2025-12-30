@@ -376,17 +376,24 @@ add_filter( 'template_include', 'sheikh_bassam_kayed_template_include', 99 );
 function sheikh_bassam_kayed_show_published_posts_in_archives( $query ) {
     // Only modify main query on frontend (not admin)
     if ( ! is_admin() && $query->is_main_query() ) {
-        // For archives and post type archives
-        if ( is_post_type_archive() || is_archive() || is_home() ) {
+        // For archives and post type archives - check by post_type query var
+        $post_type = $query->get( 'post_type' );
+        if ( $post_type && in_array( $post_type, array( 'book', 'audio_lecture', 'friday_khutbah', 'video', 'gallery' ) ) ) {
             $query->set( 'post_status', 'publish' );
         }
+        // For general archives
+        if ( $query->is_archive() || $query->is_post_type_archive() || $query->is_home() ) {
+            if ( empty( $query->get( 'post_status' ) ) ) {
+                $query->set( 'post_status', 'publish' );
+            }
+        }
         // For single posts of custom post types
-        if ( is_singular( array( 'book', 'audio_lecture', 'friday_khutbah', 'video', 'gallery' ) ) ) {
+        if ( $query->is_singular( array( 'book', 'audio_lecture', 'friday_khutbah', 'video', 'gallery' ) ) ) {
             $query->set( 'post_status', 'publish' );
         }
     }
 }
-add_action( 'pre_get_posts', 'sheikh_bassam_kayed_show_published_posts_in_archives' );
+add_action( 'pre_get_posts', 'sheikh_bassam_kayed_show_published_posts_in_archives', 10 );
 
 // Helper function to fix URLs (handles attachment IDs and relative paths)
 function sheikh_bassam_kayed_fix_url( $url ) {

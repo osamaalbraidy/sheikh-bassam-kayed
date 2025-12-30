@@ -22,9 +22,19 @@ get_header();
         <!-- Books Grid -->
         <div class="books-grid-creative archive-grid">
             <?php
-            if ( have_posts() ) {
-                while ( have_posts() ) {
-                    the_post();
+            // Re-query to ensure published posts are shown
+            global $wp_query;
+            $paged = get_query_var( 'paged' ) ? get_query_var( 'paged' ) : 1;
+            $books_query = new WP_Query( array(
+                'post_type' => 'book',
+                'post_status' => 'publish',
+                'paged' => $paged,
+                'posts_per_page' => get_option( 'posts_per_page' ),
+            ) );
+            
+            if ( $books_query->have_posts() ) {
+                while ( $books_query->have_posts() ) {
+                    $books_query->the_post();
                     $book_author = get_post_meta( get_the_ID(), '_book_author', true );
                     $book_year = get_post_meta( get_the_ID(), '_book_year', true );
                     $book_pdf = get_post_meta( get_the_ID(), '_book_pdf', true );
@@ -81,6 +91,7 @@ get_header();
                     </div>
                     <?php
                 }
+                wp_reset_postdata();
             } else {
                 ?>
                 <div class="no-content-message">
@@ -93,10 +104,16 @@ get_header();
         </div>
         
         <!-- Pagination -->
-        <?php if ( have_posts() ) : ?>
+        <?php if ( isset( $books_query ) && $books_query->have_posts() ) : ?>
             <div class="archive-pagination">
                 <?php
-                the_posts_pagination( array(
+                // Use custom pagination for the custom query
+                $big = 999999999;
+                echo paginate_links( array(
+                    'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
+                    'format' => '?paged=%#%',
+                    'current' => max( 1, $paged ),
+                    'total' => $books_query->max_num_pages,
                     'mid_size'  => 2,
                     'prev_text' => __( '← السابق', 'sheikh-bassam-kayed' ),
                     'next_text' => __( 'التالي →', 'sheikh-bassam-kayed' ),
