@@ -14,6 +14,7 @@ get_header();
         while ( have_posts() ) {
             the_post();
             $audio_file = get_post_meta( get_the_ID(), '_audio_file', true );
+            $audio_file = sheikh_bassam_kayed_fix_url( $audio_file );
             $audio_date = get_post_meta( get_the_ID(), '_audio_date', true );
             $audio_category = get_post_meta( get_the_ID(), '_audio_category', true );
             ?>

@@ -22,6 +22,7 @@ get_header();
                 'posts_per_page' => -1,
                 'orderby' => 'date',
                 'order' => 'DESC',
+                'post_status' => 'publish',
             ) );
             
             if ( $videos_query->have_posts() ) {
@@ -31,11 +32,13 @@ get_header();
                     $video_date = get_post_meta( get_the_ID(), '_video_date', true );
                     ?>
                     <article class="post-item">
-                        <?php if ( has_post_thumbnail() ) : ?>
-                            <a href="<?php the_permalink(); ?>">
+                        <a href="<?php the_permalink(); ?>">
+                            <?php if ( has_post_thumbnail() ) : ?>
                                 <?php the_post_thumbnail( 'video-thumb', array( 'style' => 'width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px;' ) ); ?>
-                            </a>
-                        <?php endif; ?>
+                            <?php else : ?>
+                                <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/video-cover.png' ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px;" />
+                            <?php endif; ?>
+                        </a>
                         <header class="entry-header">
                             <h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
                             <div class="post-meta">

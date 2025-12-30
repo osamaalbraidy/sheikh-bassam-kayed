@@ -14,6 +14,31 @@ get_header();
         <?php
         $hero_image = get_theme_mod( 'hero_image', '' );
         $hero_image_mobile = get_theme_mod( 'hero_image_mobile', '' );
+        
+        // Convert attachment ID to URL if needed, or ensure absolute URL
+        if ( $hero_image ) {
+            if ( is_numeric( $hero_image ) ) {
+                $hero_image = wp_get_attachment_image_url( $hero_image, 'full' );
+            } else {
+                // Ensure absolute URL (handle relative paths)
+                $hero_image = esc_url_raw( $hero_image );
+                if ( ! preg_match( '/^https?:\/\//', $hero_image ) ) {
+                    $hero_image = home_url( $hero_image );
+                }
+            }
+        }
+        
+        if ( $hero_image_mobile ) {
+            if ( is_numeric( $hero_image_mobile ) ) {
+                $hero_image_mobile = wp_get_attachment_image_url( $hero_image_mobile, 'full' );
+            } else {
+                // Ensure absolute URL (handle relative paths)
+                $hero_image_mobile = esc_url_raw( $hero_image_mobile );
+                if ( ! preg_match( '/^https?:\/\//', $hero_image_mobile ) ) {
+                    $hero_image_mobile = home_url( $hero_image_mobile );
+                }
+            }
+        }
         ?>
         <div class="hero-banner-container">
             <div class="hero-banner-content">
@@ -55,6 +80,7 @@ get_header();
                     'post_type' => 'book',
                     'posts_per_page' => 3,
                     'orderby' => 'rand',
+                    'post_status' => 'publish',
                 ) );
                 
                 if ( $books_query->have_posts() ) {
@@ -63,19 +89,22 @@ get_header();
                         $book_author = get_post_meta( get_the_ID(), '_book_author', true );
                         $book_year = get_post_meta( get_the_ID(), '_book_year', true );
                         $book_pdf = get_post_meta( get_the_ID(), '_book_pdf', true );
+                        $book_pdf = sheikh_bassam_kayed_fix_url( $book_pdf );
                         ?>
                         <div class="book-card-creative">
                             <div class="book-card-inner">
-                                <?php if ( has_post_thumbnail() ) : ?>
-                                    <div class="book-cover-wrapper">
-                                        <a href="<?php the_permalink(); ?>">
+                                <div class="book-cover-wrapper">
+                                    <a href="<?php the_permalink(); ?>">
+                                        <?php if ( has_post_thumbnail() ) : ?>
                                             <?php the_post_thumbnail( 'book-cover', array( 'class' => 'book-cover-creative' ) ); ?>
-                                            <div class="book-overlay">
-                                                <span class="view-book">عرض الكتاب</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                <?php endif; ?>
+                                        <?php else : ?>
+                                            <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/empty-book-cover.png' ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" class="book-cover-creative" />
+                                        <?php endif; ?>
+                                        <div class="book-overlay">
+                                            <span class="view-book">عرض الكتاب</span>
+                                        </div>
+                                    </a>
+                                </div>
                                 <div class="book-card-content">
                                     <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
                                     <div class="book-meta-creative">
@@ -123,12 +152,14 @@ get_header();
                     'post_type' => 'audio_lecture',
                     'posts_per_page' => 3,
                     'orderby' => 'rand',
+                    'post_status' => 'publish',
                 ) );
                 
                 if ( $audio_query->have_posts() ) {
                     while ( $audio_query->have_posts() ) {
                         $audio_query->the_post();
                         $audio_file = get_post_meta( get_the_ID(), '_audio_file', true );
+                        $audio_file = sheikh_bassam_kayed_fix_url( $audio_file );
                         $audio_date = get_post_meta( get_the_ID(), '_audio_date', true );
                         $audio_category = get_post_meta( get_the_ID(), '_audio_category', true );
                         ?>
@@ -187,6 +218,7 @@ get_header();
                     'post_type' => 'video',
                     'posts_per_page' => 3,
                     'orderby' => 'rand',
+                    'post_status' => 'publish',
                 ) );
                 
                 if ( $videos_query->have_posts() ) {
@@ -197,14 +229,16 @@ get_header();
                         ?>
                         <div class="video-card-creative">
                             <div class="video-thumb-wrapper">
-                                <?php if ( has_post_thumbnail() ) : ?>
-                                    <a href="<?php the_permalink(); ?>" class="video-thumb-link">
+                                <a href="<?php the_permalink(); ?>" class="video-thumb-link">
+                                    <?php if ( has_post_thumbnail() ) : ?>
                                         <?php the_post_thumbnail( 'video-thumb', array( 'class' => 'video-thumb-creative' ) ); ?>
-                                        <div class="play-overlay">
-                                            <div class="play-button">▶</div>
-                                        </div>
-                                    </a>
-                                <?php endif; ?>
+                                    <?php else : ?>
+                                        <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/video-cover.png' ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" class="video-thumb-creative" />
+                                    <?php endif; ?>
+                                    <div class="play-overlay">
+                                        <div class="play-button">▶</div>
+                                    </div>
+                                </a>
                             </div>
                             <div class="video-card-content">
                                 <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
@@ -248,6 +282,7 @@ get_header();
                     'post_type' => 'friday_khutbah',
                     'posts_per_page' => 3,
                     'orderby' => 'rand',
+                    'post_status' => 'publish',
                 ) );
                 
                 if ( $khutbahs_query->have_posts() ) {
@@ -291,6 +326,7 @@ get_header();
                     'post_type' => 'gallery',
                     'posts_per_page' => 3,
                     'orderby' => 'rand',
+                    'post_status' => 'publish',
                 ) );
                 
                 if ( $gallery_query->have_posts() ) {

@@ -26,18 +26,21 @@ get_header();
                 while ( have_posts() ) {
                     the_post();
                     $video_url = get_post_meta( get_the_ID(), '_video_url', true );
+                    $video_url = sheikh_bassam_kayed_fix_url( $video_url );
                     $video_date = get_post_meta( get_the_ID(), '_video_date', true );
                     ?>
                     <div class="video-card-creative">
                         <div class="video-thumb-wrapper">
-                            <?php if ( has_post_thumbnail() ) : ?>
-                                <a href="<?php the_permalink(); ?>" class="video-thumb-link">
+                            <a href="<?php the_permalink(); ?>" class="video-thumb-link">
+                                <?php if ( has_post_thumbnail() ) : ?>
                                     <?php the_post_thumbnail( 'video-thumb', array( 'class' => 'video-thumb-creative' ) ); ?>
-                                    <div class="play-overlay">
-                                        <div class="play-button">▶</div>
-                                    </div>
-                                </a>
-                            <?php endif; ?>
+                                <?php else : ?>
+                                    <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/video-cover.png' ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" class="video-thumb-creative" />
+                                <?php endif; ?>
+                                <div class="play-overlay">
+                                    <div class="play-button">▶</div>
+                                </div>
+                            </a>
                         </div>
                         <div class="video-card-content">
                             <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>

@@ -14,7 +14,9 @@ get_header();
         while ( have_posts() ) {
             the_post();
             $video_url = get_post_meta( get_the_ID(), '_video_url', true );
+            $video_url = sheikh_bassam_kayed_fix_url( $video_url );
             $video_file = get_post_meta( get_the_ID(), '_video_file', true );
+            $video_file = sheikh_bassam_kayed_fix_url( $video_file );
             $video_date = get_post_meta( get_the_ID(), '_video_date', true );
             ?>
             <article id="post-<?php the_ID(); ?>" <?php post_class( 'single-post-creative' ); ?>>
@@ -48,9 +50,13 @@ get_header();
                                 <?php _e( 'متصفحك لا يدعم تشغيل الفيديو', 'sheikh-bassam-kayed' ); ?>
                             </video>
                         </div>
-                    <?php elseif ( has_post_thumbnail() ) : ?>
+                    <?php else : ?>
                         <div class="video-thumbnail-single">
-                            <?php the_post_thumbnail( 'large', array( 'class' => 'video-thumb-image' ) ); ?>
+                            <?php if ( has_post_thumbnail() ) : ?>
+                                <?php the_post_thumbnail( 'large', array( 'class' => 'video-thumb-image' ) ); ?>
+                            <?php else : ?>
+                                <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/video-cover.png' ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" class="video-thumb-image" />
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                     

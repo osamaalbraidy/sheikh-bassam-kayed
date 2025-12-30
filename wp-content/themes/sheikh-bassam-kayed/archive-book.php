@@ -28,19 +28,33 @@ get_header();
                     $book_author = get_post_meta( get_the_ID(), '_book_author', true );
                     $book_year = get_post_meta( get_the_ID(), '_book_year', true );
                     $book_pdf = get_post_meta( get_the_ID(), '_book_pdf', true );
+                    
+                    // Fix PDF URL if needed (handle attachment IDs and relative paths)
+                    if ( $book_pdf ) {
+                        if ( is_numeric( $book_pdf ) ) {
+                            $book_pdf = wp_get_attachment_url( $book_pdf );
+                        } else {
+                            $book_pdf = esc_url_raw( $book_pdf );
+                            if ( ! preg_match( '/^https?:\/\//', $book_pdf ) ) {
+                                $book_pdf = home_url( $book_pdf );
+                            }
+                        }
+                    }
                     ?>
                     <div class="book-card-creative">
                         <div class="book-card-inner">
-                            <?php if ( has_post_thumbnail() ) : ?>
-                                <div class="book-cover-wrapper">
-                                    <a href="<?php the_permalink(); ?>">
+                            <div class="book-cover-wrapper">
+                                <a href="<?php the_permalink(); ?>">
+                                    <?php if ( has_post_thumbnail() ) : ?>
                                         <?php the_post_thumbnail( 'book-cover', array( 'class' => 'book-cover-creative' ) ); ?>
-                                        <div class="book-overlay">
-                                            <span class="view-book">عرض الكتاب</span>
-                                        </div>
-                                    </a>
-                                </div>
-                            <?php endif; ?>
+                                    <?php else : ?>
+                                        <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/empty-book-cover.png' ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" class="book-cover-creative" />
+                                    <?php endif; ?>
+                                    <div class="book-overlay">
+                                        <span class="view-book">عرض الكتاب</span>
+                                    </div>
+                                </a>
+                            </div>
                             <div class="book-card-content">
                                 <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
                                 <div class="book-meta-creative">

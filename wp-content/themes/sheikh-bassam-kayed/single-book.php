@@ -16,6 +16,7 @@ get_header();
             $book_author = get_post_meta( get_the_ID(), '_book_author', true );
             $book_year = get_post_meta( get_the_ID(), '_book_year', true );
             $book_pdf = get_post_meta( get_the_ID(), '_book_pdf', true );
+            $book_pdf = sheikh_bassam_kayed_fix_url( $book_pdf );
             ?>
             <article id="post-<?php the_ID(); ?>" <?php post_class( 'single-post-creative' ); ?>>
                 <!-- Post Header -->
@@ -37,11 +38,13 @@ get_header();
                 
                 <!-- Post Content -->
                 <div class="single-post-content">
-                    <?php if ( has_post_thumbnail() ) : ?>
-                        <div class="book-cover-single">
+                    <div class="book-cover-single">
+                        <?php if ( has_post_thumbnail() ) : ?>
                             <?php the_post_thumbnail( 'large', array( 'class' => 'book-cover-image' ) ); ?>
-                        </div>
-                    <?php endif; ?>
+                        <?php else : ?>
+                            <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/empty-book-cover.png' ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" class="book-cover-image" />
+                        <?php endif; ?>
+                    </div>
                     
                     <div class="entry-content-wrapper">
                         <?php the_content(); ?>

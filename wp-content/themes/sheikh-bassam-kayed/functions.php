@@ -372,6 +372,42 @@ function sheikh_bassam_kayed_template_include( $template ) {
 }
 add_filter( 'template_include', 'sheikh_bassam_kayed_template_include', 99 );
 
+// Ensure published posts are shown for all users (archives and single posts)
+function sheikh_bassam_kayed_show_published_posts_in_archives( $query ) {
+    // Only modify main query on frontend (not admin)
+    if ( ! is_admin() && $query->is_main_query() ) {
+        // For archives and post type archives
+        if ( is_post_type_archive() || is_archive() || is_home() ) {
+            $query->set( 'post_status', 'publish' );
+        }
+        // For single posts of custom post types
+        if ( is_singular( array( 'book', 'audio_lecture', 'friday_khutbah', 'video', 'gallery' ) ) ) {
+            $query->set( 'post_status', 'publish' );
+        }
+    }
+}
+add_action( 'pre_get_posts', 'sheikh_bassam_kayed_show_published_posts_in_archives' );
+
+// Helper function to fix URLs (handles attachment IDs and relative paths)
+function sheikh_bassam_kayed_fix_url( $url ) {
+    if ( empty( $url ) ) {
+        return '';
+    }
+    
+    // If it's an attachment ID (numeric), get the URL
+    if ( is_numeric( $url ) ) {
+        $url = wp_get_attachment_url( $url );
+    } else {
+        // Ensure absolute URL (handle relative paths)
+        $url = esc_url_raw( $url );
+        if ( ! preg_match( '/^https?:\/\//', $url ) ) {
+            $url = home_url( $url );
+        }
+    }
+    
+    return $url;
+}
+
 // Include custom meta boxes
 require_once get_template_directory() . '/inc/meta-boxes.php';
 
