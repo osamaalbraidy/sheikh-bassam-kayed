@@ -80,7 +80,7 @@ get_header();
 .single-page {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 20px;
 }
 
 .single-post-creative {
@@ -92,7 +92,7 @@ get_header();
 
 .single-post-header-creative {
     background: linear-gradient(135deg, #1B7560 0%, #135243 100%);
-    padding: 50px 40px;
+    padding: 35px 30px;
     color: #fff;
     text-align: center;
 }
@@ -135,12 +135,12 @@ get_header();
 }
 
 .single-post-content {
-    padding: 50px 40px;
+    padding: 30px 25px;
 }
 
 .book-cover-single {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
 }
 
 .book-cover-image {
@@ -175,8 +175,8 @@ get_header();
 }
 
 .book-download-section {
-    margin-top: 50px;
-    padding: 30px;
+    margin-top: 30px;
+    padding: 20px;
     background: linear-gradient(135deg, rgba(27, 117, 96, 0.05) 0%, rgba(19, 82, 67, 0.05) 100%);
     border-radius: 15px;
     text-align: center;
@@ -208,8 +208,8 @@ get_header();
 }
 
 .post-navigation-creative {
-    margin-top: 50px;
-    padding: 0 40px 40px;
+    margin-top: 30px;
+    padding: 0 25px 25px;
 }
 
 .post-navigation-creative .nav-links {

@@ -14,6 +14,9 @@ function sheikh_bassam_kayed_handle_dashboard_submissions() {
     // Track if we processed a form submission in this function
     $form_processed = false;
     
+    // Track which tab we're on for redirect
+    $current_tab = 'hero'; // Default tab
+    
     // Handle Customizer options updates
     if ( isset( $_POST['update_hero_settings'] ) && wp_verify_nonce( $_POST['hero_settings_nonce'], 'update_hero_settings' ) ) {
         set_theme_mod( 'hero_intro_text', wp_kses_post( $_POST['hero_intro_text'] ) );
@@ -21,6 +24,7 @@ function sheikh_bassam_kayed_handle_dashboard_submissions() {
         set_theme_mod( 'hero_image_mobile', esc_url_raw( $_POST['hero_image_mobile'] ) );
         $_SESSION['dashboard_success'] = __( 'تم تحديث إعدادات قسم البطل بنجاح', 'sheikh-bassam-kayed' );
         $form_processed = true;
+        $current_tab = 'hero';
     }
     
     if ( isset( $_POST['update_about_settings'] ) && wp_verify_nonce( $_POST['about_settings_nonce'], 'update_about_settings' ) ) {
@@ -28,12 +32,14 @@ function sheikh_bassam_kayed_handle_dashboard_submissions() {
         set_theme_mod( 'about_page_description', wp_kses_post( $_POST['about_page_description'] ) );
         $_SESSION['dashboard_success'] = __( 'تم تحديث صفحة من نحن بنجاح', 'sheikh-bassam-kayed' );
         $form_processed = true;
+        $current_tab = 'about';
     }
     
     if ( isset( $_POST['update_contact_settings'] ) && wp_verify_nonce( $_POST['contact_settings_nonce'], 'update_contact_settings' ) ) {
         set_theme_mod( 'contact_page_text', wp_kses_post( $_POST['contact_page_text'] ) );
         $_SESSION['dashboard_success'] = __( 'تم تحديث صفحة اتصل بنا بنجاح', 'sheikh-bassam-kayed' );
         $form_processed = true;
+        $current_tab = 'contact';
     }
     
     if ( isset( $_POST['update_social_settings'] ) && wp_verify_nonce( $_POST['social_settings_nonce'], 'update_social_settings' ) ) {
@@ -43,6 +49,7 @@ function sheikh_bassam_kayed_handle_dashboard_submissions() {
         }
         $_SESSION['dashboard_success'] = __( 'تم تحديث حسابات التواصل الاجتماعي بنجاح', 'sheikh-bassam-kayed' );
         $form_processed = true;
+        $current_tab = 'social';
     }
     
     if ( isset( $_POST['update_whatsapp_settings'] ) && wp_verify_nonce( $_POST['whatsapp_settings_nonce'], 'update_whatsapp_settings' ) ) {
@@ -50,12 +57,13 @@ function sheikh_bassam_kayed_handle_dashboard_submissions() {
         set_theme_mod( 'whatsapp_message', sanitize_text_field( $_POST['whatsapp_message'] ) );
         $_SESSION['dashboard_success'] = __( 'تم تحديث إعدادات واتساب بنجاح', 'sheikh-bassam-kayed' );
         $form_processed = true;
+        $current_tab = 'whatsapp';
     }
     
     // Only redirect if we processed a form submission in this function
     // CRUD operations handle their own redirects, so we don't interfere
     if ( $form_processed ) {
-        wp_safe_redirect( home_url( '/dashboard?updated=1' ) );
+        wp_safe_redirect( home_url( '/dashboard/' . $current_tab . '?updated=1' ) );
         exit;
     }
 }

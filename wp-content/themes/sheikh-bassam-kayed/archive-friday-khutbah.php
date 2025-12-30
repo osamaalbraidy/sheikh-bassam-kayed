@@ -68,14 +68,14 @@ get_header();
 .archive-page {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 20px;
 }
 
 .archive-header-creative {
     background: linear-gradient(135deg, #1B7560 0%, #135243 100%);
     border-radius: 20px;
-    padding: 60px 40px;
-    margin-bottom: 50px;
+    padding: 40px 30px;
+    margin-bottom: 30px;
     text-align: center;
     box-shadow: 0 10px 40px rgba(27, 117, 96, 0.3);
 }
@@ -107,8 +107,8 @@ get_header();
 .archive-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 30px;
-    margin-bottom: 50px;
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
 .no-content-message {
@@ -129,7 +129,7 @@ get_header();
 }
 
 .archive-pagination {
-    margin-top: 50px;
+    margin-top: 30px;
     text-align: center;
 }
 

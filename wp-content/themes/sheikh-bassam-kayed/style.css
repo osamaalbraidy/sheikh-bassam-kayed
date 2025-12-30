@@ -247,7 +247,7 @@ body.menu-open {
 
 .content-area {
     background-color: #fff;
-    padding: 30px;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -270,8 +270,8 @@ body.menu-open {
 }
 
 .post-item {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
     border-bottom: 1px solid #eee;
 }
 
@@ -466,8 +466,8 @@ body.menu-open {
 .about-page-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    margin-top: 30px;
+    gap: 20px;
+    margin-top: 20px;
 }
 
 .about-image-container {
@@ -500,14 +500,14 @@ body.menu-open {
 }
 
 .page-content {
-    margin-top: 30px;
-    padding-top: 30px;
+    margin-top: 20px;
+    padding-top: 20px;
     border-top: 1px solid #eee;
 }
 
 /* Contact Page Styles */
 .contact-content {
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .contact-text {
@@ -524,16 +524,16 @@ body.menu-open {
 
 .contact-whatsapp-section {
     background: linear-gradient(135deg, rgba(27, 117, 96, 0.05) 0%, rgba(27, 117, 96, 0.1) 100%);
-    padding: 40px;
+    padding: 25px 20px;
     border-radius: 12px;
     text-align: center;
-    margin-top: 40px;
+    margin-top: 25px;
 }
 
 .contact-whatsapp-section h3 {
     color: #1B7560;
     font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .whatsapp-number-display {
@@ -895,8 +895,8 @@ h1, h2, h3, h4, h5, h6 {
 .books-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
+    gap: 20px;
+    margin-top: 20px;
 }
 
 .book-item {
@@ -993,8 +993,8 @@ h1, h2, h3, h4, h5, h6 {
 .gallery-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 30px;
+    gap: 15px;
+    margin-top: 20px;
 }
 
 .gallery-item {
@@ -1076,8 +1076,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Archive Pages */
 .archive-header {
-    margin-bottom: 40px;
-    padding-bottom: 20px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
     border-bottom: 2px solid #eee;
 }
 
@@ -1322,22 +1322,22 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Creative Homepage Styles */
 .home-section {
-    margin-bottom: 60px;
-    padding: 40px 0;
+    margin-bottom: 30px;
+    padding: 20px 0;
 }
 
 .creative-section {
     background: linear-gradient(to bottom, transparent, rgba(27, 117, 96, 0.02));
-    padding: 50px 30px;
+    padding: 25px 20px;
     border-radius: 12px;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 .section-header {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     position: relative;
 }
 
@@ -1366,8 +1366,8 @@ h1, h2, h3, h4, h5, h6 {
 .books-grid-creative {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    margin-bottom: 40px;
+    gap: 20px;
+    margin-bottom: 25px;
     max-width: 100%;
 }
 
@@ -1521,8 +1521,8 @@ h1, h2, h3, h4, h5, h6 {
 .audio-cards-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-    margin-bottom: 40px;
+    gap: 20px;
+    margin-bottom: 25px;
     max-width: 100%;
 }
 
@@ -1640,8 +1640,8 @@ h1, h2, h3, h4, h5, h6 {
 .videos-grid-creative {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    margin-bottom: 40px;
+    gap: 20px;
+    margin-bottom: 25px;
     max-width: 100%;
 }
 
@@ -1785,8 +1785,8 @@ h1, h2, h3, h4, h5, h6 {
 .khutbah-cards-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-    margin-bottom: 40px;
+    gap: 20px;
+    margin-bottom: 25px;
     max-width: 100%;
 }
 
@@ -1924,8 +1924,8 @@ h1, h2, h3, h4, h5, h6 {
 .gallery-grid-creative {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 40px;
+    gap: 15px;
+    margin-bottom: 25px;
     max-width: 100%;
 }
 
@@ -2043,7 +2043,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .section-footer {
     text-align: center;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .no-content {
